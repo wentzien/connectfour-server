@@ -14,7 +14,7 @@ const io = socketio(server, {
     }
 });
 
-app.use(express.static("public"));
+app.use(express.static("../connectfour"));
 
 const gamesRouter = require("./routes/games");
 const db = require("./db/mysql");
@@ -140,47 +140,88 @@ server.listen(port, () => console.log(`App listening on port ${port}...)`));
 
 
 //helper functions
-function hasWon(board, player) {
-    for (let i = 0; i <= 2; i++) {
-        // Horizontal
-        if (board[i][0] === player && board[i][1] === player && board[i][2] === player)
-            return true;
-        // Vertical
-        if (board[0][i] === player && board[1][i] === player && board[2][i] === player)
-            return true;
+function checkMove(oldBoard, newBoard, player) {
+    let countDiff = 0;
+    for (let row = 0; row < 7; row++) {
+        for (let field = 0; field < 6; field++) {
+            if (oldBoard[row][field] !== newBoard[row][field]) {
+                // check all field below an break
+                // if field below are not filled, return false
+                // if all field are filled countDiff ++
+                if (newBoard[row][field] !== player) return false;
+                for (let i = field; i < 6; i++) {
+                    if (newBoard[row][i] !== "a" && newBoard[row][i] !== "b") return false;
+                }
+                countDiff++;
+
+            }
+        }
     }
-    // Diagonal
-    if (board[0][0] === player && board[1][1] === player && board[2][2] === player)
-        return true;
-    // Counter Diagonal
-    if (board[2][0] === player && board[1][1] === player && board[0][2] === player)
-        return true;
+    return countDiff === 1;
+}
+function hasWon(board, player) {
+
+    let winCounter;
+
+    // vertikal
+    for (let row = 0; row < 7; row++) {
+        winCounter = 0;
+        for (let line = 0; line < 6; line++) {
+            if (board[row][line] === player) {
+                winCounter++;
+                if (winCounter >= 4) return true;
+            } else {
+                winCounter = 0;
+            }
+        }
+    }
+
+    // horizontal
+    for (let line = 0; line < 6; line++) {
+        winCounter = 0;
+        for (let row = 0; row < 7; row++) {
+            if (board[row][line] === player) {
+                winCounter++;
+                if (winCounter >= 4) return true;
+            } else {
+                winCounter = 0;
+            }
+        }
+    }
+
+    // diagonal rechts
+    for (let row = 0; row < 4; row++) {
+        for (let line = 3; line < 6; line++) {
+            if (board[row][line] === player) {
+                if ((board[row][line] === player)
+                    && (board[row + 1][line - 1] === player)
+                    && (board[row + 2][line - 2] === player)
+                    && (board[row + 3][line - 3] === player)) return true;
+            }
+        }
+    }
+
+    // diagonal links
+    for (let row = 0; row < 4; row++) {
+        for (let line = 0; line < 3; line++) {
+            if (board[row][line] === player) {
+                if ((board[row][line] === player)
+                    && (board[row + 1][line + 1] === player)
+                    && (board[row + 2][line + 2] === player)
+                    && (board[row + 3][line + 3] === player)) return true;
+            }
+        }
+    }
+
     return false;
 }
-
 function checkDraw(board) {
-    for (let i = 0; i <= 2; i++) {
-        for (let j = 0; j <= 2; j++) {
-            if (board[i][j] === 0) {
+    for (let row = 0; row < 7; row++) {
+        for (let line = 0; line < 6; line++) {
+            if (board[row][line] === 0) {
                 return false;
             }
         }
     }
     return true;
-}
-
-function checkMove(oldBoard, newBoard, player) {
-    let countDiff = 0;
-    for (let x = 0; x < 3; x++) {
-        for (let y = 0; y < 3; y++) {
-            if (oldBoard[x][y] !== newBoard[x][y]) {
-                if (newBoard[x][y] === player) {
-                    countDiff++;
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
-    return countDiff === 1;
 }
