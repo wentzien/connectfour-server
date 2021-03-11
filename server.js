@@ -110,9 +110,13 @@ io.on("connection", socket => {
                     aPlayerId: aPlayerId,
                     bPlayerId: bPlayerId,
                     board: [
-                        [0, 0, 0],
-                        [0, 0, 0],
-                        [0, 0, 0]
+                        [0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0],
+                        [0, 0, 0, 0, 0, 0]
                     ],
                     aScore: aScore,
                     bScore: bScore,
@@ -159,6 +163,7 @@ function checkMove(oldBoard, newBoard, player) {
     }
     return countDiff === 1;
 }
+
 function hasWon(board, player) {
 
     let winCounter;
@@ -215,6 +220,7 @@ function hasWon(board, player) {
 
     return false;
 }
+
 function checkDraw(board) {
     for (let row = 0; row < 7; row++) {
         for (let line = 0; line < 6; line++) {
