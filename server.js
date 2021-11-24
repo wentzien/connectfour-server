@@ -14,8 +14,6 @@ const io = socketio(server, {
     }
 });
 
-app.use(express.static(process.env.PUBLIC_FOLDER));
-
 const gamesRouter = require("./routes/games");
 const db = require("./db/mysql");
 
